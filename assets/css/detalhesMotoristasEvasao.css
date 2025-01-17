@@ -1,0 +1,26 @@
+.detalhes {
+  width: 100%;
+}
+
+.break-word {
+  word-wrap: break-word;
+  white-space: normal;
+  font-size: 1.0rem;
+}
+
+td, th {
+  vertical-align: middle;
+}
+
+.break-word a {
+  font-size: .9rem;
+}
+
+.imprimir_termo {
+  margin-top: 15px;
+}
+
+.imprimir_termo a {
+  margin-left: 30px;
+}
+
