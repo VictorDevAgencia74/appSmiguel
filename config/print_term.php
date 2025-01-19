@@ -26,8 +26,8 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
         $matricula_motorista = $row_motorista['matricula'];
     }
     
-    // Buscar ocorrências
-    $query_ocorrencias = "SELECT id, data, motorista, descricao FROM ocorrencia_trafego WHERE motorista = '$motorista' AND ocorrencia = 'Evasão'";
+    // Buscar ocorrências com todas as colunas
+    $query_ocorrencias = "SELECT id, data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, acao, observacoes, video1, video2, video3 FROM ocorrencia_trafego WHERE motorista = '$motorista' AND ocorrencia = 'Evasão'";
     $resultado_ocorrencias = mysqli_query($conexao, $query_ocorrencias);
     $ocorrencias = [];
     if (mysqli_num_rows($resultado_ocorrencias) > 0) {
@@ -50,20 +50,25 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
         return "$dia de " . $meses[$mes] . " de $ano";
     }
 
-    // Formatar a data atual
     $data_emissao = date('m/Y');
     $data_completa = date('d/m/Y');
     $data_atual_extenso = formatarDataExtenso(date('Y-m-d'));
 
     // Mover ocorrências para a tabela de finalizados
-    $conexao->autocommit(FALSE); // Iniciar transação
+    $conexao->autocommit(FALSE);
     foreach ($ocorrencias as $ocorrencia) {
         $id = $ocorrencia['id'];
 
-        // Inserir na tabela de finalizadas
-        $query_insert = "INSERT INTO ocorrencia_finalizada (id, data, motorista, descricao) VALUES (?, ?, ?, ?)";
+        // Inserir na tabela de finalizadas com todas as colunas
+        $query_insert = "INSERT INTO ocorrencia_finalizada (id, data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, acao, observacoes, video1, video2, video3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexao->prepare($query_insert);
-        $stmt->bind_param('ssss', $ocorrencia['id'], $ocorrencia['data'], $ocorrencia['motorista'], $ocorrencia['descricao']);
+        $stmt->bind_param(
+            'ssssssssssssss',
+            $ocorrencia['id'], $ocorrencia['data'], $ocorrencia['motorista'], $ocorrencia['descricao'],
+            $ocorrencia['horario'], $ocorrencia['fiscal'], $ocorrencia['carro'], $ocorrencia['linha'],
+            $ocorrencia['ocorrencia'], $ocorrencia['acao'], $ocorrencia['observacoes'],
+            $ocorrencia['video1'], $ocorrencia['video2'], $ocorrencia['video3']
+        );
         $stmt->execute();
         
         // Remover da tabela original
@@ -72,8 +77,8 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
         $stmt->bind_param('s', $id);
         $stmt->execute();
     }
-    $conexao->commit(); // Confirmar transação
-    $conexao->autocommit(TRUE); // Retornar ao modo normal
+    $conexao->commit();
+    $conexao->autocommit(TRUE);
 
 } else {
     echo "Parâmetros não especificados.";
