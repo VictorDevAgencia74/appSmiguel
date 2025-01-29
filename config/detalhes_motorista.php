@@ -156,11 +156,33 @@ if (isset($_GET['motorista'])) {
     echo "Motorista não especificado.";
 }
 
+
+// Determinar o arquivo de impressão com base na ação disciplinar atual
+$arquivo_impressao = '';
+switch ($acao) {
+    case 'Orientação':
+        $arquivo_impressao = 'imprimir_acao_disciplinar_orientacao.php';
+        break;
+    case 'Advertência':
+        $arquivo_impressao = 'imprimir_acao_disciplinar_advertencia.php';
+        break;
+    case 'Suspensão de 1 dia':
+    case 'Suspensão de 3 dias':
+        $arquivo_impressao = 'imprimir_acao_disciplinar_suspensao.php';
+        break;
+    case 'Justa Causa':
+        $arquivo_impressao = 'imprimir_acao_disciplinar_justaCausa.php';
+        break;
+    default:
+        $arquivo_impressao = 'imprimir_acao_disciplinar_orientacao.php'; // Padrão
+        break;
+}
+
 mysqli_close($conexao);
 ?>
 
 <!-- Botão para imprimir a ação disciplinar -->
-<a href="../config/imprimir_acao_disciplinar.php?motorista_id=<?php echo urlencode($motorista_id); ?>" target="_blank">
+<a href="../config/<?php echo $arquivo_impressao; ?>?motorista_id=<?php echo urlencode($motorista_id); ?>" target="_blank">
     <button>Imprimir Ação Disciplinar</button>
 </a>
 
