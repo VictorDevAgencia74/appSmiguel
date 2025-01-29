@@ -1,0 +1,32 @@
+/* GLOBAIS */
+h4 {
+	margin-bottom: 5px;
+}
+
+/* IMPRESSÃO DE AÇÃO DISCIPLINAR */
+img{
+	width: 150px;
+}
+
+.dados_cabecalho {
+	width: 100%;
+	text-align: center;
+}
+
+.dados_table {
+	width: 100%;
+}
+
+.assinatura{
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
+}
+
+.dataatual {
+	text-align: right;
+}
+
+.cabecalho_assinatura{
+	margin-top: 50px;
+}
