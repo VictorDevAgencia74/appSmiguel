@@ -102,27 +102,26 @@ mysqli_close($conexao);
     </head>
     <body onload="window.print(); setTimeout(showPopup, 1000);">
         <div class="container">
-            <div id="nav">
+            <div class="nav">
                 <table border="1">
                     <tr>
                         <td>
-                            <div id="logo">
+                            <div class="logo">
                                 <img src="../assets/img/logo/logo.png" alt="logo-sm">
                             </div>
                         </td>
                         <td class="dados_cabecalho">
-                            <div id="title">
+                            <div class="title">
                                 <h2>Ficha de <?php echo htmlspecialchars($acao_disciplinar);?> Individual</h2>
                             </div>
                         </td>
                     </tr>
                 </table>
             </div>
-            <div class="linha-separadora"></div>
             
             <div>
                 <h4>Matrícula: <strong><?php echo htmlspecialchars($matricula); ?> - <strong><?php echo htmlspecialchars($nome_motorista); ?></strong></strong></h4>
-                <h4>Cargo:</h4>
+                <h4>Cargo: Motorista</h4>
                 <h4>Data: <strong><?php echo htmlspecialchars($data_acao); ?></strong></h4>
             </div>
             <div>
@@ -150,12 +149,6 @@ mysqli_close($conexao);
                     <tr><td colspan="5">Nenhuma ocorrência encontrada.</td></tr>
                 <?php } ?>
             </table>
-            <h3>Histórico de Ações:</h3>
-                <ul>
-                    <?php foreach ($acoes_disciplinas as $acao): ?>
-                        <li><?php echo htmlspecialchars($acao['acao']); ?> (<?php echo htmlspecialchars($acao['data']); ?>)</li>
-                    <?php endforeach; ?>
-                </ul>
             <div class="cabecalho_assinatura">
                 <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; E por estarem as partes certas, justas e contratadas, firmam o presente.</p>
                 <p class="dataatual">Ilhéus, <?php echo $data_atual_extenso; ?></p>
@@ -173,14 +166,14 @@ mysqli_close($conexao);
             </div>
             <div class="assinatura">
                 <div>
-                    <P>__________________________________</P>
+                    <P>____________________________________</P>
                     <p class="assinar">Testemunha 1:</p>
-                    <p>CPF:______________________________</p>
+                    <p>CPF:________________________________</p>
                 </div>
                 <div>
-                    <P>__________________________________</P>
+                    <P>____________________________________</P>
                     <p class="assinar">Testemunha 2:</p>
-                    <p>CPF:______________________________</p>
+                    <p>CPF:________________________________</p>
                 </div>
             </div>
         </div>

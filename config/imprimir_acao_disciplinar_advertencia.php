@@ -60,197 +60,120 @@ if (empty($acoes_disciplinas)) {
     }
 }
 
-// Função para formatar a data
-    function formatarDataExtenso($data) {
-        $meses = [
-            1 => 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 
-            'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-        ];
-        
-        $dia = date('d', strtotime($data));
-        $mes = date('n', strtotime($data));
-        $ano = date('Y', strtotime($data));
-        
-        return "$dia de " . $meses[$mes] . " de $ano";
+// Buscar ocorrências do motorista
+$query_ocorrencias = "SELECT id, data, motorista, descricao, horario FROM ocorrencia_trafego WHERE motorista = '$matricula'";
+$resultado_ocorrencias = mysqli_query($conexao, $query_ocorrencias);
+
+$ocorrencias = [];
+if ($resultado_ocorrencias && mysqli_num_rows($resultado_ocorrencias) > 0) {
+    while ($row_ocorrencia = mysqli_fetch_assoc($resultado_ocorrencias)) {
+        $ocorrencias[] = $row_ocorrencia;
     }
+}
 
-    // $data_emissao = date('m/Y');
-    $data_acao = date('d/m/Y');
-    $data_atual_extenso = formatarDataExtenso(date('Y-m-d'));
+// Função para formatar a data por extenso
+function formatarDataExtenso($data) {
+    $meses = [
+        1 => 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 
+        'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    
+    $dia = date('d', strtotime($data));
+    $mes = date('n', strtotime($data));
+    $ano = date('Y', strtotime($data));
+    
+    return "$dia de " . $meses[$mes] . " de $ano";
+}
 
-// Fechar a conexão com o banco de dados
+$data_acao = date('d/m/Y');
+$data_atual_extenso = formatarDataExtenso(date('Y-m-d'));
+
+// Fechar conexão com o banco de dados
 mysqli_close($conexao);
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imprimir Ação Disciplinar</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Imprimir Ação Disciplinar</title>
+        <link rel="stylesheet" type="text/css" href="../assets/css/styles.css">
+    </head>
+    <body onload="window.print(); setTimeout(showPopup, 1000);">
+        <div class="container">
+            <div class="nav">
+                <table border="1">
+                    <tr>
+                        <td>
+                            <div class="logo">
+                                <img src="../assets/img/logo/logo.png" alt="logo-sm">
+                            </div>
+                        </td>
+                        <td class="dados_cabecalho">
+                            <h2>Ficha de <?php echo htmlspecialchars($acao_disciplinar);?></h2>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div>
+                <h4>Matrícula: <strong><?php echo htmlspecialchars($matricula); ?> - <strong><?php echo htmlspecialchars($nome_motorista); ?></strong></strong></h4>
+                <h4>Cargo: Motorista</h4>
+                <h4>Data: <strong><?php echo htmlspecialchars($data_acao); ?></strong></h4>
+            </div>
+            <div>
+                <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;O Funcionário acima identificado, fica <?php echo htmlspecialchars($acao_disciplinar);?> por indiciplina, pelas ocorrencias abaixo: 
+                </p>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 10px;
-            padding: 20px;
-        }
-
-        img {
-            max-width: 120px;
-        }
-
-        #title {
-            width: 100%;
-            padding-top: 10px;
-            text-align: center;
-        }
-
-        #nav {
-            display: flex;
-            justify-content: left;
-        }
-
-        h1 {
-            color: #dc3545; /* Cor vermelho para destacar o título */
-        }
-        .container {
-            width: 600px;
-            height: 900px;
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 5px;
-
-        }
-        p {
-            font-size: .9rem;
-            margin: 10px 0;
-        }
-        .justificar {
-            text-align: justify;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 5px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 10px;
-            font-size: .9rem;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .linha-separadora {
-            border: solid 1px #ccc;
-        }
-
-        #dataatual {
-            text-align: end;
-            margin-top: 20px;
-        }
-
-        .assinatura {
-            display: flex;
-            gap: 10%;
-            padding-top: 10px;
-        }
-
-        .assinar {
-            margin-bottom: 10px;
-            font-size: .8rem;
-        }
-
-        /* Estilo para o pop-up de sucesso */
-        .popup {
-            display: none;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        .popup-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .popup-content button {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-
-<body onload="window.print();">    
-<body onload="window.print(); setTimeout(showPopup, 1000);">
-
-<div class="container">
-    <div id="nav">
-        <div id="logo">
-            <img src="../assets/img/logo/logo.png" alt="logo-sm">
+            </div>
+            <table border="1">
+                <tr>
+                    <th>OS</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Descrição</th>
+                </tr>
+                <?php if (!empty($ocorrencias)) { ?>
+                    <?php foreach ($ocorrencias as $ocorrencia) { ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($ocorrencia['id']); ?></td>
+                        <td><?php echo htmlspecialchars($ocorrencia['data']); ?></td>
+                        <td><?php echo htmlspecialchars($ocorrencia['horario']); ?></td>
+                        <td class="dados_table"><?php echo htmlspecialchars($ocorrencia['descricao']); ?></td>
+                    </tr>
+                    <?php } ?>
+                <?php } else { ?>
+                    <tr><td colspan="5">Nenhuma ocorrência encontrada.</td></tr>
+                <?php } ?>
+            </table>
+            <div class="cabecalho_assinatura">
+                <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Conforme Regulamento Interno Art.(09), que diz o seguinte: "O empregado se obriga a acatar todas as ordens de seus superiores hierárquicos, não se permitindo, em hipótese alguma, o ato de indisciplina ou de insubordinação".</p>
+                <p class="dataatual">Ilhéus, <?php echo $data_atual_extenso; ?></p>
+            </div>
+            
+            <div class="assinatura">
+                <div>
+                    <P> ____________________________________</P>
+                    <p class="assinar"><?php echo htmlspecialchars($nome_motorista); ?></p>
+                </div>
+                <div>
+                    <P>_____________________________________</P>
+                    <p class="assinar">Transporte Urbano São Miguel de Ilhéus LTDA</p>
+                </div>
+            </div>
+            <div class="assinatura">
+                <div>
+                    <P>____________________________________</P>
+                    <p class="assinar">Testemunha 1:</p>
+                    <p>CPF:________________________________</p>
+                </div>
+                <div>
+                    <P>____________________________________</P>
+                    <p class="assinar">Testemunha 2:</p>
+                    <p>CPF:________________________________</p>
+                </div>
+            </div>
         </div>
-        <div id="title">
-            <h3>Ficha de <?php echo htmlspecialchars($acao_disciplinar); ?></h3>
-        </div>
-    </div>
-    <div class="linha-separadora"></div>
-    
-    <div>
-        <h4>Matrícula: <strong><?php echo htmlspecialchars($matricula); ?> - <strong><?php echo htmlspecialchars($nome_motorista); ?></strong></strong></h4>
-        <h4>Data: <strong><?php echo htmlspecialchars($data_acao); ?></strong></h4>
-        <h3>Histórico de Ações:</h3>
-        <ul>
-            <?php foreach ($acoes_disciplinas as $acao): ?>
-                <li><?php echo htmlspecialchars($acao['acao']); ?> (<?php echo htmlspecialchars($acao['data']); ?>)</li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
-    <div>
-        <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pelo presente instrumento particular, que entre si fazem, de um lado como empregadora a firma 
-        <strong>TRANSPORTE URBANO SÃO MIGUEL DE ILHÉUS LTDA</strong>, e de outro lado o empregado Sr. 
-        <strong><?php echo htmlspecialchars($nome_motorista); ?></strong>, ficou justo e contratado os seguintes.
-    </p>
-
-    </div>
-    
-    <div>
-        <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; E por estarem as partes certas, justas e contratadas, firmam o presente.</p>
-        <p id="dataatual">Ilhéus, <?php echo $data_atual_extenso; ?></p>
-    </div>
-    
-    <div class="assinatura">
-        <div>
-            <P> __________________________________</P>
-            <p class="assinar"><?php echo htmlspecialchars($nome_motorista); ?></p>
-        </div>
-        <div>
-            <P>__________________________________</P>
-            <p class="assinar">Transporte Urbano São Miguel de Ilhéus LTDA</p>
-        </div>
-    </div>
-    <div class="assinatura">
-        <div>
-            <P>__________________________________</P>
-            <p class="assinar">Testemunha 1:</p>
-            <p>CPF:______________________________</p>
-        </div>
-        <div>
-            <P>__________________________________</P>
-            <p class="assinar">Testemunha 2:</p>
-            <p>CPF:______________________________</p>
-        </div>
-    </div>
-</div>
-
-</body>
+    </body>
 </html>

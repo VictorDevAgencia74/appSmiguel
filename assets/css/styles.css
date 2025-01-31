@@ -1,32 +1,95 @@
 /* GLOBAIS */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #dc3545; /* Cor vermelho para destacar o título */
+}
+
 h4 {
 	margin-bottom: 5px;
+	margin: 5px 0;
+}
+
+p {
+    font-size: .9rem;
+    margin: 10px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px;
+    font-size: .9rem;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
 }
 
 /* IMPRESSÃO DE AÇÃO DISCIPLINAR */
-img{
-	width: 150px;
+
+.container {
+	width: 680px;
+	height: 950px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.logo {
+	width: 120px;
+}
+
+.logo img {
+    max-width: 100%;
 }
 
 .dados_cabecalho {
-	width: 100%;
-	text-align: center;
+    width: 100%;
+    text-align: center;
 }
 
-.dados_table {
-	width: 100%;
+.nav {
+    display: flex;
+    justify-content: left;
 }
 
-.assinatura{
-	display: flex;
-	justify-content: space-between;
-	margin-top: 20px;
+.justificar {
+    text-align: justify;
 }
 
 .dataatual {
-	text-align: right;
+    margin-left: auto;
+    text-align: right;
 }
 
-.cabecalho_assinatura{
-	margin-top: 50px;
+.dados_table {
+    word-wrap: break-word; /* Para compatibilidade */
+    overflow-wrap: break-word; /* Para navegadores modernos */
+    white-space: normal; /* Garante que o texto quebre */
+    max-width: 200px; /* Define um limite para evitar que o texto fique muito longo */
 }
+
+.assinatura {
+    display: flex;
+    justify-content: space-between;
+    gap: 10%;
+}
+
+.assinar {
+    font-size: .8rem;
+ }
