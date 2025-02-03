@@ -120,6 +120,7 @@ mysqli_close($conexao);
             </div>
             
             <div>
+                <h3>TRANSPORTE URBANO SÃO MIGUEL DE ILHÉUS LTDA.</h3>
                 <h4>Matrícula: <strong><?php echo htmlspecialchars($matricula); ?> - <strong><?php echo htmlspecialchars($nome_motorista); ?></strong></strong></h4>
                 <h4>Cargo: Motorista</h4>
                 <h4>Data: <strong><?php echo htmlspecialchars($data_acao); ?></strong></h4>

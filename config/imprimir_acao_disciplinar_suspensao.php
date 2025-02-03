@@ -182,7 +182,16 @@ mysqli_close($conexao);
             </div>
             <div>
                 <p class="justificar">Senhor <strong><?php echo htmlspecialchars($nome_motorista); ?></strong>, matricula <strong>(<?php echo htmlspecialchars($matricula); ?>)</strong>, função <strong>MOTORISTA</strong> <br><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pelo presente notificamos que a partir de <strong><?php echo htmlspecialchars($data_acao); ?></strong> está suspenso do exercício de suas funções, pelo prazo de <strong>01(um) dia sem vencimentos, por indisciplina, gerando as ocorrências abaixo:</strong>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pelo presente notificamos que a partir de <strong><?php echo htmlspecialchars($data_acao); ?></strong> está suspenso do exercício de suas funções, pelo prazo de <strong>
+        <?php
+        if ($dias_suspensao == 1) {
+            echo "01(um) dia";
+        } elseif ($dias_suspensao == 3) {
+            echo "03(três) dias";
+        } else {
+            echo "N/A"; // Caso não haja suspensão ou seja outro valor
+        }
+        ?> sem vencimentos, por indisciplina, gerando as ocorrências abaixo:</strong>
 
                 </p>
 

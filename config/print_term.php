@@ -94,79 +94,8 @@ mysqli_close($conexao);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emissão de Vales</title>
+    <link rel="stylesheet" type="text/css" href="../assets/css/styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 10px;
-            padding: 20px;
-        }
-
-        img {
-            max-width: 120px;
-        }
-
-        #title {
-            width: 100%;
-            padding-top: 10px;
-            text-align: center;
-        }
-
-        #nav {
-            display: flex;
-            justify-content: left;
-        }
-
-        h1 {
-            color: #dc3545; /* Cor vermelho para destacar o título */
-        }
-        .container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        p {
-            font-size: .9rem;
-            margin: 10px 0;
-        }
-        .justificar {
-            text-align: justify;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 5px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 10px;
-            font-size: .9rem;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .linha-separadora {
-            border: solid 1px #ccc;
-        }
-
-        #dataatual {
-            text-align: end;
-            margin-top: 20px;
-        }
-
-        .assinatura {
-            display: flex;
-            gap: 10%;
-            padding-top: 10px;
-        }
-
-        .assinar {
-            margin-bottom: 10px;
-            font-size: .8rem;
-        }
 
         /* Estilo para o pop-up de sucesso */
         .popup {
@@ -195,13 +124,22 @@ mysqli_close($conexao);
 <body onload="window.print(); setTimeout(showPopup, 1000);">
 
 <div class="container">
-    <div id="nav">
-        <div id="logo">
-            <img src="../assets/img/logo/logo.png" alt="logo-sm">
-        </div>
-        <div id="title">
-            <h3>Autorização Para Desconto Em Folha</h3>
-        </div>
+    <div class="nav">
+        <table>
+            <tr>
+                <td>
+                    <div class="logo">
+                        <img src="../assets/img/logo/logo.png" alt="logo-sm">
+                    </div>
+                </td>
+                <td>
+                    <div class="dados_cabecalho">
+                        <h2>Autorização Para Desconto Em Folha</h2>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        
     </div>
     <div class="linha-separadora"></div>
     
@@ -226,7 +164,7 @@ mysqli_close($conexao);
         valores em sua rescisão contratual de trabalho.
     </p><br>
     
-    <table>
+    <table border="1">
         <tr>
             <th>OS</th>
             <th>Data</th>
@@ -238,13 +176,13 @@ mysqli_close($conexao);
             <td><?php echo htmlspecialchars($ocorrencia['id']); ?></td>
             <td><?php echo htmlspecialchars($ocorrencia['data']); ?></td>
             <td><?php echo htmlspecialchars($ocorrencia['motorista']); ?></td>
-            <td><?php echo htmlspecialchars($ocorrencia['descricao']); ?></td>
+            <td class="dados_table"><?php echo htmlspecialchars($ocorrencia['descricao']); ?></td>
         </tr>
         <?php } ?>
     </table>
     <div>
         <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; E por estarem as partes certas, justas e contratadas, firmam o presente.</p>
-        <p id="dataatual">Ilhéus, <?php echo $data_atual_extenso; ?></p>
+        <p class="dataatual">Ilhéus, <?php echo $data_atual_extenso; ?></p>
     </div>
     
     <div class="assinatura">

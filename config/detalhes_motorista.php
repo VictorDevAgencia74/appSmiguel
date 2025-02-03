@@ -124,7 +124,7 @@ if (isset($_GET['motorista'])) {
                         <td class='text-center'>" . htmlspecialchars($row['id']) . "</td>
                         <td class='text-center'>" . htmlspecialchars($row['data']) . "</td>
                         <td class='text-center'>" . htmlspecialchars($row['motorista']) . "</td>
-                        <td class='break-word'>" . htmlspecialchars($row['descricao']) . "</td>
+                        <td class='dados_table break-word'>" . htmlspecialchars($row['descricao']) . "</td>
                         <td>";
                 if ($row['video1']) {
                     echo "<a href='../views/VisualizaVideo.php?video1=" . urlencode($row['id']) . "'>Vídeo-1</a><br>";
