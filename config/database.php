@@ -1,8 +1,8 @@
 <?php
 // Configurações do banco de dados
 $dbHost = "localhost";
-$dbUser = "root";
-$dbPassword = "";
+$dbUser = "u219851065_admin";
+$dbPassword = "Xavier364074$";
 $dbName = "u219851065_smiguel";
 
 // Criar conexão
