@@ -16,14 +16,16 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
     $datas_ocorrencias = mysqli_real_escape_string($conexao, $_GET['datas']);
     
     // Buscar nome e matrícula do motorista
-    $query_motorista = "SELECT nome, matricula FROM cadastro_motorista WHERE matricula = '$motorista'";
+    $query_motorista = "SELECT nome, matricula, cpf FROM cadastro_motorista WHERE matricula = '$motorista'";
     $resultado_motorista = mysqli_query($conexao, $query_motorista);
     $nome_motorista = '';
     $matricula_motorista = '';
+    $cpf_motorista = '';
     if (mysqli_num_rows($resultado_motorista) > 0) {
         $row_motorista = mysqli_fetch_assoc($resultado_motorista);
         $nome_motorista = $row_motorista['nome'];
         $matricula_motorista = $row_motorista['matricula'];
+        $cpf_motorista = $row_motorista['cpf'];
     }
     
     // Buscar ocorrências com todas as colunas
@@ -134,7 +136,7 @@ mysqli_close($conexao);
                 </td>
                 <td>
                     <div class="dados_cabecalho">
-                        <h2>Autorização Para Desconto Em Folha</h2>
+                        <h2 style="text-transform: uppercase;">Autorização Para Desconto Em Folha</h2>
                     </div>
                 </td>
             </tr>
@@ -145,11 +147,11 @@ mysqli_close($conexao);
     
     <div>
         <h4>Matrícula: <strong><?php echo htmlspecialchars($matricula_motorista); ?> - <strong><?php echo htmlspecialchars($nome_motorista); ?></strong></strong></h4>
-        <h4>Data: <strong><?php echo $data_completa; ?></strong></h4>
+        <!--<h4>Data: <strong><?php //echo $data_completa; ?></strong></h4>-->
     </div>
     <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pelo presente instrumento particular, que entre si fazem, de um lado como empregadora a firma 
         <strong>TRANSPORTE URBANO SÃO MIGUEL DE ILHÉUS LTDA</strong>, e de outro lado o empregado Sr. 
-        <strong><?php echo htmlspecialchars($nome_motorista); ?></strong>, ficou justo e contratado os seguintes.
+        <strong><?php echo htmlspecialchars($nome_motorista); ?>, CPF: <?php echo $cpf_motorista; ?></strong>, ficou justo e contratado os seguintes.
     </p>
     <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;O empregado no exercício de suas funções de MOTORISTA, autoriza a efetuar o desconto de <strong>R$ <?php echo number_format($valor_a_pagar, 2, ',', '.'); ?></strong> 
         em seu salário, através da Folha de Pagamento de <strong><?php echo $data_emissao; ?></strong>, referente à(s) ocorrência(s) devidamente demonstrada(s) no relatório em anexo e comprovada(s) por
@@ -168,14 +170,20 @@ mysqli_close($conexao);
         <tr>
             <th>OS</th>
             <th>Data</th>
+            <th>horario</th>
             <th>Motorista</th>
-            <th>Descrição</th>
+            <th>Carro</th>
+            <th>Valor</th>
+            <th>Ocorrência</th>
         </tr>
         <?php foreach ($ocorrencias as $ocorrencia) { ?>
         <tr>
             <td><?php echo htmlspecialchars($ocorrencia['id']); ?></td>
             <td><?php echo htmlspecialchars($ocorrencia['data']); ?></td>
+            <td><?php echo htmlspecialchars($ocorrencia['horario']); ?></td>
             <td><?php echo htmlspecialchars($ocorrencia['motorista']); ?></td>
+            <td><?php echo htmlspecialchars($ocorrencia['carro']); ?></td>
+            <td>R$ 4,80</td>
             <td class="dados_table"><?php echo htmlspecialchars($ocorrencia['descricao']); ?></td>
         </tr>
         <?php } ?>

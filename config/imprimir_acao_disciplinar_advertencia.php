@@ -61,7 +61,7 @@ if (empty($acoes_disciplinas)) {
 }
 
 // Buscar ocorrências do motorista
-$query_ocorrencias = "SELECT id, data, motorista, descricao, horario FROM ocorrencia_trafego WHERE motorista = '$matricula'";
+$query_ocorrencias = "SELECT id, data, carro, motorista, descricao, horario FROM ocorrencia_trafego WHERE motorista = '$matricula'";
 $resultado_ocorrencias = mysqli_query($conexao, $query_ocorrencias);
 
 $ocorrencias = [];
@@ -111,7 +111,7 @@ mysqli_close($conexao);
                             </div>
                         </td>
                         <td class="dados_cabecalho">
-                            <h2>Ficha de <?php echo htmlspecialchars($acao_disciplinar);?></h2>
+                            <h2 style="text-transform: uppercase;">Ficha de <?php echo htmlspecialchars($acao_disciplinar);?></h2>
                         </td>
                     </tr>
                 </table>
@@ -121,7 +121,7 @@ mysqli_close($conexao);
                 <h3>TRANSPORTE URBANO SÃO MIGUEL DE ILHÉUS LTDA.</h3>
                 <h4>Matrícula: <strong><?php echo htmlspecialchars($matricula); ?> - <strong><?php echo htmlspecialchars($nome_motorista); ?></strong></strong></h4>
                 <h4>Cargo: Motorista</h4>
-                <h4>Data: <strong><?php echo htmlspecialchars($data_acao); ?></strong></h4>
+                <!--<h4>Data: <strong><?php //echo htmlspecialchars($data_acao); ?></strong></h4>-->
             </div>
             <div>
                 <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;O Funcionário acima identificado, fica <?php echo htmlspecialchars($acao_disciplinar);?> por indiciplina, pelas ocorrencias abaixo: 
@@ -132,14 +132,16 @@ mysqli_close($conexao);
                 <tr>
                     <th>OS</th>
                     <th>Data</th>
+                    <th>Carro</th>
                     <th>Horário</th>
-                    <th>Descrição</th>
+                    <th>Ocorrência</th>
                 </tr>
                 <?php if (!empty($ocorrencias)) { ?>
                     <?php foreach ($ocorrencias as $ocorrencia) { ?>
                     <tr>
                         <td><?php echo htmlspecialchars($ocorrencia['id']); ?></td>
                         <td><?php echo htmlspecialchars($ocorrencia['data']); ?></td>
+                        <td><?php echo htmlspecialchars($ocorrencia['carro']); ?></td>
                         <td><?php echo htmlspecialchars($ocorrencia['horario']); ?></td>
                         <td class="dados_table"><?php echo htmlspecialchars($ocorrencia['descricao']); ?></td>
                     </tr>

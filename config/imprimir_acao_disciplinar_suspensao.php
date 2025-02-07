@@ -61,7 +61,7 @@ if (empty($acoes_disciplinas)) {
 }
 
 // Buscar ocorrências do motorista
-$query_ocorrencias = "SELECT id, data, motorista, descricao, horario FROM ocorrencia_trafego WHERE motorista = '$matricula'";
+$query_ocorrencias = "SELECT id, data, carro, motorista, descricao, horario FROM ocorrencia_trafego WHERE motorista = '$matricula'";
 $resultado_ocorrencias = mysqli_query($conexao, $query_ocorrencias);
 
 $ocorrencias = [];
@@ -170,7 +170,7 @@ mysqli_close($conexao);
                             </div>
                         </td>
                         <td class="dados_cabecalho">
-                            <h2>SUSPENSÃO</h2>
+                            <h2 style="text-transform: uppercase;">Suspensão</h2>
                         </td>
                     </tr>
                 </table>
@@ -178,7 +178,7 @@ mysqli_close($conexao);
             
             <div>
                 <h3>TRANSPORTE URBANO SÃO MIGUEL DE ILHÉUS LTDA.</h3>
-                <h3>AVISO DE SUSPENÇÃO</h3>
+                <h3>AVISO DE SUSPENSÃO</h3>
             </div>
             <div>
                 <p class="justificar">Senhor <strong><?php echo htmlspecialchars($nome_motorista); ?></strong>, matricula <strong>(<?php echo htmlspecialchars($matricula); ?>)</strong>, função <strong>MOTORISTA</strong> <br><br>
@@ -200,14 +200,16 @@ mysqli_close($conexao);
                 <tr>
                     <th>OS</th>
                     <th>Data</th>
+                    <th>Carro</th>
                     <th>Horário</th>
-                    <th>Descrição</th>
+                    <th>Ocorrência</th>
                 </tr>
                 <?php if (!empty($ocorrencias)) { ?>
                     <?php foreach ($ocorrencias as $ocorrencia) { ?>
                     <tr>
                         <td><?php echo htmlspecialchars($ocorrencia['id']); ?></td>
                         <td><?php echo htmlspecialchars($ocorrencia['data']); ?></td>
+                        <td><?php echo htmlspecialchars($ocorrencia['carro']); ?></td>
                         <td><?php echo htmlspecialchars($ocorrencia['horario']); ?></td>
                         <td class="dados_table"><?php echo htmlspecialchars($ocorrencia['descricao']); ?></td>
                     </tr>
@@ -217,7 +219,7 @@ mysqli_close($conexao);
                 <?php } ?>
             </table>
             <div class="cabecalho_assinatura">
-                <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fica advertido de que, caso volte a reincidir diante das ocorrências já verificadas no decorrer do contrato de trabalho, será despedido por <strong>"Justa Causa" nos termos do Art. 182 da CLT, letra "E".</strong><br>
+                <p class="justificar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fica advertido de que, caso volte a reincidir diante das ocorrências já verificadas no decorrer do contrato de trabalho, será despedido por <strong>"Justa Causa" nos termos do Art. 482 da CLT, letra "E".</strong><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conforme Regulamento Interno Art.(09), que diz o seguinte: "O empregado se obriga a acatar todas as ordens dos seus superiores hierárquicos, não se permitindo, em hipótese alguma, o ato de indisciplina ou de insubordinação.<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Portanto, apresentar-se ao serviço no horário usual, no dia <strong><?php echo $dias_suspensao > 0 ? $data_retorno : '(CALCULO AUTOMÁTICO)'; ?></strong>, assim pedimos a confirmação com o seu ciente.</p>
                 <p class="dataatual">Ilhéus, <?php echo $data_atual_extenso; ?></p>
