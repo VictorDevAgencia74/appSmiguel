@@ -141,11 +141,11 @@ if (isset($_GET['motorista'])) {
             echo "</table>";
             echo "</div>";
 
-            // Exibir o valor a pagar e o link para imprimir o termo
+            // Exibir o valor a pagar.
             echo "<div class='imprimir_termo'>
                     <p><strong>Total a pagar: R$ " . number_format($valor_a_pagar, 2, ',', '.') . "</strong></p>
-                    <p><a href='#' id='imprimir_termo_link' data-motorista='$matricula' data-valor='" . urlencode($valor_a_pagar) . "' data-datas='" . urlencode($datas_ocorrencias_str) . "'>Imprimir Termo</a></p>
                   </div>";
+                  
         } else {
             echo "Nenhuma ocorrência de evasão encontrada para o motorista: " . htmlspecialchars($matricula);
         }
@@ -180,11 +180,6 @@ switch ($acao) {
 
 mysqli_close($conexao);
 ?>
-
-<!-- Botão para imprimir a ação disciplinar -->
-<a href="../config/<?php echo $arquivo_impressao; ?>?motorista_id=<?php echo urlencode($motorista_id); ?>" target="_blank">
-    <button>Imprimir Ação Disciplinar</button>
-</a>
 
 
 <script>

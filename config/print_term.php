@@ -15,17 +15,19 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
     $valor_a_pagar = mysqli_real_escape_string($conexao, $_GET['valor']);
     $datas_ocorrencias = mysqli_real_escape_string($conexao, $_GET['datas']);
     
-    // Buscar nome e matrícula do motorista
-    $query_motorista = "SELECT nome, matricula, cpf FROM cadastro_motorista WHERE matricula = '$motorista'";
+    // Buscar nome, matrícula e ID do motorista
+    $query_motorista = "SELECT id, nome, matricula, cpf FROM cadastro_motorista WHERE matricula = '$motorista'";
     $resultado_motorista = mysqli_query($conexao, $query_motorista);
     $nome_motorista = '';
     $matricula_motorista = '';
     $cpf_motorista = '';
+    $motorista_id = '';
     if (mysqli_num_rows($resultado_motorista) > 0) {
         $row_motorista = mysqli_fetch_assoc($resultado_motorista);
         $nome_motorista = $row_motorista['nome'];
         $matricula_motorista = $row_motorista['matricula'];
         $cpf_motorista = $row_motorista['cpf'];
+        $motorista_id = $row_motorista['id']; // Recupera o ID do motorista
     }
     
     // Buscar ocorrências com todas as colunas
@@ -56,17 +58,80 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
     $data_completa = date('d/m/Y');
     $data_atual_extenso = formatarDataExtenso(date('Y-m-d'));
 
+    // Determinar a ação disciplinar com base nas últimas ações
+    $acao = 'Orientação'; // Valor padrão
+    $data_acao = date('Y-m-d'); // Data atual
+
+    if (!empty($ocorrencias)) {
+        // Verificar as últimas ações disciplinares do motorista
+        $query_ultimas_acoes = "SELECT acao, data_acao FROM acoes_disciplinares WHERE motorista_id = '$motorista_id' ORDER BY data_acao DESC LIMIT 3";
+        $resultado_ultimas_acoes = mysqli_query($conexao, $query_ultimas_acoes);
+        $ultimas_acoes = [];
+        if (mysqli_num_rows($resultado_ultimas_acoes) > 0) {
+            while ($row = mysqli_fetch_assoc($resultado_ultimas_acoes)) {
+                $ultimas_acoes[] = $row;
+            }
+        }
+
+        if (!empty($ultimas_acoes)) {
+            $ultima_acao = $ultimas_acoes[0]['acao'];
+            switch ($ultima_acao) {
+                case 'Orientação':
+                    $acao = 'Advertência';
+                    break;
+                case 'Advertência':
+                    $acao = 'Suspensão de 1 dia';
+                    break;
+                case 'Suspensão de 1 dia':
+                    $acao = 'Suspensão de 3 dias';
+                    break;
+                case 'Suspensão de 3 dias':
+                    $data_ultima_acao = new DateTime($ultimas_acoes[0]['data_acao']);
+                    $data_atual = new DateTime();
+                    $diferenca_meses = $data_atual->diff($data_ultima_acao)->m + ($data_atual->diff($data_ultima_acao)->y * 12);
+                    if ($diferenca_meses > 6) {
+                        $acao = 'Advertência';
+                    } else {
+                        $acao = 'Justa Causa';
+                    }
+                    break;
+                default:
+                    $acao = 'Orientação';
+                    break;
+            }
+        }
+    }
+
+    // Inserir a ação disciplinar na tabela `acoes_disciplinares`
+    $query_inserir_acao = "INSERT INTO acoes_disciplinares (motorista_id, acao, data_acao) VALUES (?, ?, ?)";
+    $stmt = $conexao->prepare($query_inserir_acao);
+    $stmt->bind_param('iss', $motorista_id, $acao, $data_acao);
+    if (!$stmt->execute()) {
+        die("Erro ao salvar a ação disciplinar: " . $stmt->error);
+    }
+
     // Mover ocorrências para a tabela de finalizados
     $conexao->autocommit(FALSE);
     foreach ($ocorrencias as $ocorrencia) {
         $id = $ocorrencia['id'];
 
-        // Inserir na tabela de finalizadas com todas as colunas
-        $query_insert = "INSERT INTO ocorrencia_finalizada (id, data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, acao, observacoes, video1, video2, video3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // Verificar se o ID já existe na tabela de finalizados
+        $query_check = "SELECT id FROM ocorrencia_finalizada WHERE id = ?";
+        $stmt = $conexao->prepare($query_check);
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            // Se o ID já existir, pule esta ocorrência ou gere um novo ID único
+            continue;
+        }
+
+        // Inserir na tabela de finalizadas (sem o ID, se for auto-incremento)
+        $query_insert = "INSERT INTO ocorrencia_finalizada (data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, acao, observacoes, video1, video2, video3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexao->prepare($query_insert);
         $stmt->bind_param(
-            'ssssssssssssss',
-            $ocorrencia['id'], $ocorrencia['data'], $ocorrencia['motorista'], $ocorrencia['descricao'],
+            'sssssssssssss',
+            $ocorrencia['data'], $ocorrencia['motorista'], $ocorrencia['descricao'],
             $ocorrencia['horario'], $ocorrencia['fiscal'], $ocorrencia['carro'], $ocorrencia['linha'],
             $ocorrencia['ocorrencia'], $ocorrencia['acao'], $ocorrencia['observacoes'],
             $ocorrencia['video1'], $ocorrencia['video2'], $ocorrencia['video3']
@@ -76,7 +141,7 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
         // Remover da tabela original
         $query_delete = "DELETE FROM ocorrencia_trafego WHERE id = ?";
         $stmt = $conexao->prepare($query_delete);
-        $stmt->bind_param('s', $id);
+        $stmt->bind_param('i', $id);
         $stmt->execute();
     }
     $conexao->commit();
@@ -231,10 +296,13 @@ mysqli_close($conexao);
     }
 
     function closePopup() {
+        // Fecha o pop-up
         document.getElementById('successPopup').style.display = 'none';
-        window.opener.location.href = '../views/ocorrenciasEvasao.php'; // Atualiza a página de detalhes do motorista
-        window.close(); // Fecha a aba atual (imprimir_termo.php)
+
+        // Redireciona para a página "ocorrenciasEvasao.php"
+        window.location.href = '../views/ocorrenciasEvasao.php';
     }
+</script>
 </script>
 
 </body>

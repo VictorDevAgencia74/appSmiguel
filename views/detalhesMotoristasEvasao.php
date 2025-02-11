@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Table - Brand</title>
+    <title>Detalhes Evasão</title>
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
     <link rel="stylesheet" href="../assets/fonts/fontawesome-all.min.css">
@@ -25,10 +25,6 @@
                     <li class="nav-item"><a class="nav-link" href="ocorrenciasVideos.php"><i class="fas fa-table"></i><span>Ocorrências</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="ocorrenciasEvasao.php"><i class="fas fa-table"></i><span>Evasão</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="relatorios/relatorioVideo.html"><i class="fas fa-tachometer-alt"></i><span>Vídeo</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="relatorios/relatorioFinanceiro.php"><i class="fas fa-tachometer-alt"></i><span>Financeiro</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="relatorios/relatorioOp.php"><i class="fas fa-tachometer-alt"></i><span>Operacional</span></a></li>
-                    <li class="nav-item"><a class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a></li>
-                    <li class="nav-item"><a class="nav-link"><i class="fas fa-user-circle"></i><span>Register</span></a></li>
                 </ul>
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
@@ -69,6 +65,19 @@
                                     <div class="detalhes">
                                         <?php include '../config/detalhes_motorista.php'; ?>
                                     </div>
+                                    <!-- Botão para imprimir a ação disciplinar -->
+                                        <a href="../config/<?php echo $arquivo_impressao; ?>?motorista_id=<?php echo urlencode($motorista_id); ?>" target="_blank">
+                                            <button class="btn btn-primary mb-2">
+                                                <i class="fas fa-print"></i> Imprimir Ação Disciplinar
+                                            </button>
+                                        </a>
+
+                                        <!-- Botão para imprimir o termo -->
+                                        <a href="../config/print_term.php?motorista=<?php echo urlencode($matricula); ?>&valor=<?php echo urlencode($valor_a_pagar); ?>&datas=<?php echo urlencode($datas_ocorrencias_str); ?>" target="_blank">
+                                            <button class="btn btn-secondary mb-2">
+                                                <i class="fas fa-file-alt"></i> Imprimir Termo
+                                            </button>
+                                        </a>
                                 </div>
                             </div>
                         </div>
