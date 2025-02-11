@@ -61,7 +61,7 @@ if (empty($acoes_disciplinas)) {
 }
 
 // Buscar ocorrências do motorista
-$query_ocorrencias = "SELECT id, data, carro, motorista, descricao, horario FROM ocorrencia_trafego WHERE motorista = '$matricula' AND ocorrencia = 'Evasão'";
+$query_ocorrencias = "SELECT id, data, carro, motorista, descricao, horario FROM ocorrencia_trafego WHERE motorista = '$matricula'";
 $resultado_ocorrencias = mysqli_query($conexao, $query_ocorrencias);
 
 $ocorrencias = [];
