@@ -73,11 +73,18 @@
                                         </a>
 
                                         <!-- Botão para imprimir o termo -->
-                                        <a href="../config/print_term.php?motorista=<?php echo urlencode($matricula); ?>&valor=<?php echo urlencode($valor_a_pagar); ?>&datas=<?php echo urlencode($datas_ocorrencias_str); ?>" target="_blank">
-                                            <button class="btn btn-secondary mb-2">
-                                                <i class="fas fa-file-alt"></i> Imprimir Termo
-                                            </button>
-                                        </a>
+                                        <button class="btn btn-secondary mb-2" onclick="confirmarImpressao('<?php echo urlencode($matricula); ?>', '<?php echo urlencode($valor_a_pagar); ?>', '<?php echo urlencode($datas_ocorrencias_str); ?>')">
+                                            <i class="fas fa-file-alt"></i> Imprimir Termo
+                                        </button>
+
+                                        <script>
+                                        function confirmarImpressao(matricula, valor, datas) {
+                                            if (confirm("Você realmente deseja imprimir o termo? Esta ação finalizará a ocorrência.")) {
+                                                window.open(`../config/print_term.php?motorista=${matricula}&valor=${valor}&datas=${datas}`, '_blank');
+                                            }
+                                        }
+                                        </script>
+
                                 </div>
                             </div>
                         </div>
