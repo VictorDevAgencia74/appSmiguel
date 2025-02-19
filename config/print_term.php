@@ -1,6 +1,12 @@
 <?php
+// Definir o fuso horário para o Brasil
+date_default_timezone_set('America/Sao_Paulo');
+
 // Importa as configurações do banco de dados
 require_once 'database.php';
+
+// Iniciar sessão para acessar o usuário logado
+session_start();
 
 // Criar conexão
 $conexao = mysqli_connect($dbHost, $dbUser, $dbPassword, $dbName);
@@ -10,20 +16,24 @@ if (!$conexao) {
     die("Falha na conexão: " . mysqli_connect_error());
 }
 
+// Verificar se os parâmetros necessários foram passados
 if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas'])) {
     $motorista = mysqli_real_escape_string($conexao, $_GET['motorista']);
     $valor_a_pagar = mysqli_real_escape_string($conexao, $_GET['valor']);
     $datas_ocorrencias = mysqli_real_escape_string($conexao, $_GET['datas']);
     
     // Buscar nome, matrícula e ID do motorista
-    $query_motorista = "SELECT id, nome, matricula, cpf FROM cadastro_motorista WHERE matricula = '$motorista'";
-    $resultado_motorista = mysqli_query($conexao, $query_motorista);
+    $query_motorista = "SELECT id, nome, matricula, cpf FROM cadastro_motorista WHERE matricula = ?";
+    $stmt_motorista = $conexao->prepare($query_motorista);
+    $stmt_motorista->bind_param('s', $motorista);
+    $stmt_motorista->execute();
+    $resultado_motorista = $stmt_motorista->get_result();
     $nome_motorista = '';
     $matricula_motorista = '';
     $cpf_motorista = '';
     $motorista_id = '';
-    if (mysqli_num_rows($resultado_motorista) > 0) {
-        $row_motorista = mysqli_fetch_assoc($resultado_motorista);
+    if ($resultado_motorista->num_rows > 0) {
+        $row_motorista = $resultado_motorista->fetch_assoc();
         $nome_motorista = $row_motorista['nome'];
         $matricula_motorista = $row_motorista['matricula'];
         $cpf_motorista = $row_motorista['cpf'];
@@ -31,11 +41,14 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
     }
     
     // Buscar ocorrências com todas as colunas
-    $query_ocorrencias = "SELECT id, data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, acao, observacoes, video1, video2, video3 FROM ocorrencia_trafego WHERE motorista = '$motorista' AND ocorrencia = 'Evasão'";
-    $resultado_ocorrencias = mysqli_query($conexao, $query_ocorrencias);
+    $query_ocorrencias = "SELECT id, data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, acao, observacoes, video1, video2, video3 FROM ocorrencia_trafego WHERE motorista = ? AND ocorrencia = 'Evasão'";
+    $stmt_ocorrencias = $conexao->prepare($query_ocorrencias);
+    $stmt_ocorrencias->bind_param('s', $motorista);
+    $stmt_ocorrencias->execute();
+    $resultado_ocorrencias = $stmt_ocorrencias->get_result();
     $ocorrencias = [];
-    if (mysqli_num_rows($resultado_ocorrencias) > 0) {
-        while($row = mysqli_fetch_assoc($resultado_ocorrencias)) {
+    if ($resultado_ocorrencias->num_rows > 0) {
+        while ($row = $resultado_ocorrencias->fetch_assoc()) {
             $ocorrencias[] = $row;
         }
     }
@@ -64,11 +77,14 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
 
     if (!empty($ocorrencias)) {
         // Verificar as últimas ações disciplinares do motorista
-        $query_ultimas_acoes = "SELECT acao, data_acao FROM acoes_disciplinares WHERE motorista_id = '$motorista_id' ORDER BY data_acao DESC LIMIT 3";
-        $resultado_ultimas_acoes = mysqli_query($conexao, $query_ultimas_acoes);
+        $query_ultimas_acoes = "SELECT acao, data_acao FROM acoes_disciplinares WHERE motorista_id = ? ORDER BY data_acao DESC LIMIT 3";
+        $stmt_ultimas_acoes = $conexao->prepare($query_ultimas_acoes);
+        $stmt_ultimas_acoes->bind_param('i', $motorista_id);
+        $stmt_ultimas_acoes->execute();
+        $resultado_ultimas_acoes = $stmt_ultimas_acoes->get_result();
         $ultimas_acoes = [];
-        if (mysqli_num_rows($resultado_ultimas_acoes) > 0) {
-            while ($row = mysqli_fetch_assoc($resultado_ultimas_acoes)) {
+        if ($resultado_ultimas_acoes->num_rows > 0) {
+            while ($row = $resultado_ultimas_acoes->fetch_assoc()) {
                 $ultimas_acoes[] = $row;
             }
         }
@@ -104,11 +120,17 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
 
     // Inserir a ação disciplinar na tabela `acoes_disciplinares`
     $query_inserir_acao = "INSERT INTO acoes_disciplinares (motorista_id, acao, data_acao) VALUES (?, ?, ?)";
-    $stmt = $conexao->prepare($query_inserir_acao);
-    $stmt->bind_param('iss', $motorista_id, $acao, $data_acao);
-    if (!$stmt->execute()) {
-        die("Erro ao salvar a ação disciplinar: " . $stmt->error);
+    $stmt_inserir_acao = $conexao->prepare($query_inserir_acao);
+    $stmt_inserir_acao->bind_param('iss', $motorista_id, $acao, $data_acao);
+    if (!$stmt_inserir_acao->execute()) {
+        die("Erro ao salvar a ação disciplinar: " . $stmt_inserir_acao->error);
     }
+
+    // Dados adicionais para a tabela finalizada
+    $acao_finalizada = $acao; // Ação disciplinar determinada
+    $data_finalizacao = date('Y-m-d'); 
+    $hora_finalizacao = date('H:i:s'); 
+    $usuario_finalizou = $_SESSION['usuario']; 
 
     // Mover ocorrências para a tabela de finalizados
     $conexao->autocommit(FALSE);
@@ -117,36 +139,51 @@ if (isset($_GET['motorista']) && isset($_GET['valor']) && isset($_GET['datas']))
 
         // Verificar se o ID já existe na tabela de finalizados
         $query_check = "SELECT id FROM ocorrencia_finalizada WHERE id = ?";
-        $stmt = $conexao->prepare($query_check);
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            // Se o ID já existir, pule esta ocorrência ou gere um novo ID único
-            continue;
+        $stmt_check = $conexao->prepare($query_check);
+        $stmt_check->bind_param('i', $id);
+        $stmt_check->execute();
+        $stmt_check->store_result();
+        if ($stmt_check->num_rows > 0) {
+            continue; // Pula se já existir
         }
 
-        // Inserir na tabela de finalizadas (sem o ID, se for auto-incremento)
-        $query_insert = "INSERT INTO ocorrencia_finalizada (data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, acao, observacoes, video1, video2, video3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conexao->prepare($query_insert);
-        $stmt->bind_param(
-            'sssssssssssss',
-            $ocorrencia['data'], $ocorrencia['motorista'], $ocorrencia['descricao'],
-            $ocorrencia['horario'], $ocorrencia['fiscal'], $ocorrencia['carro'], $ocorrencia['linha'],
-            $ocorrencia['ocorrencia'], $ocorrencia['acao'], $ocorrencia['observacoes'],
-            $ocorrencia['video1'], $ocorrencia['video2'], $ocorrencia['video3']
+        // Inserir na tabela de finalizadas (usando a coluna "acao" em vez de "acao_finalizada")
+        $query_insert = "INSERT INTO ocorrencia_finalizada (
+            data, motorista, descricao, horario, fiscal, carro, linha, ocorrencia, 
+            acao, observacoes, video1, video2, video3, data_finalizacao, 
+            hora_finalizacao, usuario_finalizou
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // 16 parâmetros
+
+        $stmt_insert = $conexao->prepare($query_insert);
+        $stmt_insert->bind_param(
+            'ssssssssssssssss',
+            $ocorrencia['data'], 
+            $ocorrencia['motorista'], 
+            $ocorrencia['descricao'],
+            $ocorrencia['horario'], 
+            $ocorrencia['fiscal'], 
+            $ocorrencia['carro'], 
+            $ocorrencia['linha'],
+            $ocorrencia['ocorrencia'], 
+            $acao_finalizada, // Ação disciplinar atual (agora na coluna "acao")
+            $ocorrencia['observacoes'],
+            $ocorrencia['video1'], 
+            $ocorrencia['video2'], 
+            $ocorrencia['video3'],
+            $data_finalizacao, 
+            $hora_finalizacao, 
+            $usuario_finalizou
         );
-        $stmt->execute();
+        $stmt_insert->execute();
         
         // Remover da tabela original
         $query_delete = "DELETE FROM ocorrencia_trafego WHERE id = ?";
-        $stmt = $conexao->prepare($query_delete);
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
+        $stmt_delete = $conexao->prepare($query_delete);
+        $stmt_delete->bind_param('i', $id);
+        $stmt_delete->execute();
     }
     $conexao->commit();
     $conexao->autocommit(TRUE);
-
 } else {
     echo "Parâmetros não especificados.";
     exit;
